@@ -23,8 +23,7 @@ def put_item(todo_item_id: int, todo_list_id: int, update_todo_item: UpdateTodoI
 
 @router.delete("/{todo_item_id}", tags=["Todo項目"])
 def delete_list(todo_list_id: int, todo_item_id: int, db: Session = Depends(get_db)):
-    delete_todo_list(db, todo_item_id, todo_list_id)
-    return {}
+    return delete_todo_list(todo_list_id, todo_item_id, db)
 
 
 @router.get("/", response_model=list[ResponseTodoItem], tags=["Todo項目"])

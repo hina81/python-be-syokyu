@@ -29,9 +29,7 @@ def put_todo_list(todo_list_id: int, update_todo: UpdateTodoList, session: Sessi
         db_list.title = update_todo.title
     if update_todo.description is not None:
         db_list.description = update_todo.description  
-    # 更新日時を現在の時間に変更
     db_list.updated_at = datetime.utcnow()
-    # DBに保存
     session.commit()
     session.refresh(db_list)
 

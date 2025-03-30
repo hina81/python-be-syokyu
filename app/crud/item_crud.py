@@ -1,16 +1,25 @@
 from datetime import datetime
 from app.models.item_model import ItemModel
+from app.models.list_model import ListModel
 from sqlalchemy.orm import Session
 from app.schemas.item_schema import NewTodoItem, UpdateTodoItem, ResponseTodoItem
 from app.const import TodoItemStatusCode
+from fastapi import HTTPException
 
 def get_todo_item(db:Session, todo_list_id: int, todo_item_id: int):
-    return db.query(ItemModel).filter(
+    db_item = db.query(ItemModel).filter(
         ItemModel.id == todo_item_id, 
         ItemModel.todo_list_id == todo_list_id
     ).first()
+    if db_item is None:
+        raise HTTPException(status_code=404, detail="Todo item not found")
+    return db_item
 
 def post_todo_item(db: Session, todo_list_id: int, new_item: NewTodoItem):
+    db_list = db.query(ListModel).filter(ListModel.id == todo_list_id).first()
+    if db_list is None:
+        raise HTTPException(status_code=404, detail="Todo list not found")
+
     db_item = ItemModel(
         todo_list_id=todo_list_id,
         title=new_item.title,
@@ -30,6 +39,8 @@ def put_todo_item(db:Session, todo_item_id: int, todo_list_id: int, update_todo_
         ItemModel.id == todo_item_id, 
         ItemModel.todo_list_id == todo_list_id
     ).first()
+    if db_item is None:
+        raise HTTPException(status_code=404, detail="Todo item not found")
     if update_todo_item.title is not None:
         db_item.title = update_todo_item.title
     if update_todo_item.description is not None:
@@ -49,9 +60,11 @@ def delete_todo_list(todo_list_id: int, todo_item_id: int, db: Session):
         ItemModel.id == todo_item_id, 
         ItemModel.todo_list_id == todo_list_id
     ).first()
+    if db_item is None:
+        raise HTTPException(status_code=404, detail="Todo item not found")
     db.delete(db_item)
     db.commit()
-    return db_item
+    return {}
 
 def get_items(session: Session) -> list[ResponseTodoItem]:
     db_todo_lists = session.query(ItemModel).all()
