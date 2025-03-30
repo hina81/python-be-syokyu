@@ -27,5 +27,5 @@ def delete_list(todo_list_id: int, todo_item_id: int, db: Session = Depends(get_
 
 
 @router.get("/", response_model=list[ResponseTodoItem], tags=["Todo項目"])
-def get_todo_items(session: Session = Depends(get_db)):
-    return get_items(session)
+def get_todo_items(todo_list_id: int, page: int = 1, per_page: int = 10, session: Session = Depends(get_db)):
+    return get_items(session, todo_list_id, page, per_page)

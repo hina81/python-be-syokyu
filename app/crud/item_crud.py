@@ -66,6 +66,7 @@ def delete_todo_list(todo_list_id: int, todo_item_id: int, db: Session):
     db.commit()
     return {}
 
-def get_items(session: Session) -> list[ResponseTodoItem]:
-    db_todo_lists = session.query(ItemModel).all()
-    return db_todo_lists
+def get_items(session: Session, todo_list_id: int, page: int = 1, per_page: int = 10) -> list[ResponseTodoItem]:
+    offset = (page - 1) * per_page
+    db_items = session.query(ItemModel).filter(ItemModel.todo_list_id == todo_list_id).offset(offset).limit(per_page).all()
+    return db_items
